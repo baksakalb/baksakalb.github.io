@@ -51,15 +51,22 @@
       margin-right: 10px;
     }
     .slider-container {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Space between slider and value */
-  width: 100%; /* Ensure the container takes up available space */
-}
-
-.slider-container input[type="range"] {
-  flex: 1; /* Slider grows to fill available space */
-}
+      display: flex;
+      align-items: center;
+      gap: 10px; /* Space between slider and value */
+      width: 100%; /* Ensure the container takes up available space */
+    }
+    .slider-container input[type="range"] {
+      flex: 1; /* Slider grows to fill available space */
+    }
+    .input-box {
+      width: 60px;
+      padding: 5px;
+      margin-left: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -95,7 +102,6 @@
         <span class="slider-value" id="profitValue">50%</span>
       </div>
     </div>
-
 
     <!-- Prize Pool Results -->
     <div class="results">
@@ -160,7 +166,7 @@
       netGainedSpan.textContent = netGained.toFixed(2);
       netProfitSpan.textContent = netProfit.toFixed(2);
       prizePoolSpan.textContent = prizePool.toFixed(2);
-      profitValue.textContent = ${profitPercentage}%;
+      profitValue.textContent = `${profitPercentage}%`;
 
       updatePrizeDistribution(prizePool);
     }
@@ -175,42 +181,66 @@
       for (let i = 1; i <= numWinners; i++) {
         const row = document.createElement('div');
         row.className = 'prize-row';
-        row.innerHTML = 
+        row.innerHTML = `
           <label for="winner${i}">Kazanan ${i}. (%):</label>
-          <input type="range" id="winner${i}" min="0" max="100" value="${i === 1 ? 50 : 0}">
-          <span id="winnerValue${i}">₺0.00 (0%)</span>
-        ;
+          <div class="slider-container">
+            <input type="range" id="winner${i}" min="0" max="100" value="${i === 1 ? 50 : 0}">
+            <input type="number" id="winnerInput${i}" value="${i === 1 ? 50 : 0}" class="input-box">
+            <span id="winnerValue${i}">₺0.00 (0%)</span>
+          </div>
+        `;
         winnerSliders.appendChild(row);
 
-        const slider = row.querySelector(#winner${i});
-        const output = row.querySelector(#winnerValue${i});
+        const slider = row.querySelector(`#winner${i}`);
+        const inputBox = row.querySelector(`#winnerInput${i}`);
+        const output = row.querySelector(`#winnerValue${i}`);
 
+        // Update slider and input box together
         slider.addEventListener('input', () => {
-          totalPercentage = sliders.reduce((sum, s) => sum + parseInt(s.value), 0);
+          inputBox.value = slider.value;
+          updatePrizeAmount(slider, prizePool, output);
+        });
 
-          if (totalPercentage > 100) {
-            errorMsg.style.display = 'block';
-            return;
-          } else {
-            errorMsg.style.display = 'none';
+        // Update slider when the input box value is changed
+        inputBox.addEventListener('input', () => {
+          const value = parseInt(inputBox.value);
+          if (value >= 0 && value <= 100) {
+            slider.value = value;
+            updatePrizeAmount(slider, prizePool, output);
           }
-
-          const amount = (prizePool * (slider.value / 100)).toFixed(2);
-          output.textContent = ₺${amount} (${slider.value}%);
-          distributedPrizeSpan.textContent = totalPercentage === 100 ? ${prizePool.toFixed(2)} ₺ : 'Hatalı!';
         });
 
         sliders.push(slider);
       }
     }
 
-    document.querySelectorAll('input').forEach(input => {
-      input.addEventListener('input', calculate);
-    });
+    function updatePrizeAmount(slider, prizePool, output) {
+      let totalPercentage = 0;
+      sliders.forEach(slider => {
+        totalPercentage += parseInt(slider.value);
+      });
+
+      if (totalPercentage > 100) {
+        errorMsg.style.display = 'block';
+        return;
+      } else {
+        errorMsg.style.display = 'none';
+      }
+
+      const amount = (prizePool * (slider.value / 100)).toFixed(2);
+      output.textContent = `₺${amount} (${slider.value}%)`;
+      distributedPrizeSpan.textContent = totalPercentage === 100 ? `${prizePool.toFixed(2)} ₺` : 'Hatalı!';
+    }
+
+    profitSlider.addEventListener('input', calculate);
+    numPeopleInput.addEventListener('input', calculate);
+    numNoProxyInput.addEventListener('input', calculate);
+    entryFeeInput.addEventListener('input', calculate);
+    costPerPersonInput.addEventListener('input', calculate);
+    costNoProxyInput.addEventListener('input', calculate);
+    numWinnersInput.addEventListener('input', calculate);
 
     calculate(); // Initial calculation
   </script>
 </body>
 </html>
-
-they should go to the right of that box
