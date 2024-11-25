@@ -171,13 +171,8 @@
           e.preventDefault(); // Prevent default scrolling
           let currentValue = parseFloat(this.value) || 0;
           
-          // For entry fee and cost inputs, use step of 0.01
-          if (this.id === 'entryFee' || this.id === 'costPerPerson' || this.id === 'costNoProxy') {
-            this.value = (currentValue + 0.01).toFixed(2);
-          } else {
-            // For integer inputs, increment by 1
-            this.value = currentValue + 1;
-          }
+          // Always increment by 1 for all inputs
+          this.value = (currentValue + 1).toFixed(2);
           
           // Trigger input event to recalculate
           this.dispatchEvent(new Event('input'));
@@ -189,13 +184,8 @@
           // Ensure value doesn't go below min
           let minValue = parseFloat(this.min) || 0;
           
-          // For entry fee and cost inputs, use step of 0.01
-          if (this.id === 'entryFee' || this.id === 'costPerPerson' || this.id === 'costNoProxy') {
-            this.value = Math.max(minValue, currentValue - 0.01).toFixed(2);
-          } else {
-            // For integer inputs, decrement by 1
-            this.value = Math.max(minValue, currentValue - 1);
-          }
+          // Always decrement by 1 for all inputs
+          this.value = Math.max(minValue, currentValue - 1).toFixed(2);
           
           // Trigger input event to recalculate
           this.dispatchEvent(new Event('input'));
