@@ -4,70 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MTG Turnuva Düzenleyici</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: url('background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    .form-group1 {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    .form-group1 label {
-      flex: 1;
-      margin-right: 10px;
-      text-align: left;
-    }
-    .form-group1 input {
-      flex: 0 0 150px;
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .slider-value {
-      text-align: center;
-      margin-top: 5px;
-    }
-    .results, .prize-distribution {
-      margin-top: 20px;
-    }
-    .prize-row {
-      margin-bottom: 10px;
-    }
-    .prize-row label {
-      margin-right: 10px;
-    }
-    .slider-container {
-      display: flex;
-      align-items: center;
-      gap: 10px; /* Space between slider and value */
-      width: 100%; /* Ensure the container takes up available space */
-    }
-    .slider-container input[type="range"] {
-      flex: 1; /* Slider grows to fill available space */
-    }
-    .input-box {
-      width: 60px;
-      padding: 5px;
-      margin-left: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-  </style>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .form-group1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  .form-group1 label {
+    flex: 1;
+    margin-right: 10px;
+    text-align: left;
+  }
+  .form-group1 input {
+    flex: 0 0 150px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center; /* Center the text inside the input fields */
+  }
+  .slider-value {
+    text-align: center;
+    margin-top: 5px;
+  }
+  .results, .prize-distribution {
+    margin-top: 20px;
+  }
+  .prize-row {
+    margin-bottom: 10px;
+  }
+  .prize-row label {
+    margin-right: 10px;
+  }
+  .slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between slider and value */
+    width: 100%; /* Ensure the container takes up available space */
+  }
+  .slider-container input[type="range"] {
+    flex: 1; /* Slider grows to fill available space */
+  }
+  .input-box {
+    width: 60px;
+    padding: 5px;
+    margin-left: 10px;
+    text-align: center; /* Center the text inside the number input fields */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+</style>
+
 </head>
 <body>
   <div class="container">
