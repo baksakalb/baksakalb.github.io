@@ -5,29 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MTG Turnuva Düzenleyici</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background-image: url("background.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      height: 100%;
-      overflow-y: auto;
     }
-    /* Rest of the previous CSS remains the same */
-    body {
-      font-family: Arial, sans-serif;
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="number"], input[type="range"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .slider-value {
+      text-align: center;
+      font-weight: bold;
+    }
+    .prize-distribution {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f4f4f4;
+      border-radius: 8px;
+    }
+    .prize-row {
+      margin-bottom: 10px;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
