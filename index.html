@@ -50,6 +50,16 @@
     .prize-row label {
       margin-right: 10px;
     }
+    .slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between slider and value */
+  width: 100%; /* Ensure the container takes up available space */
+}
+
+.slider-container input[type="range"] {
+  flex: 1; /* Slider grows to fill available space */
+}
   </style>
 </head>
 <body>
@@ -78,11 +88,14 @@
         <input type="number" id="costNoProxy" step="0.01" min="0" value="0">
       </div>
     </form>
-    <div class="form-group">
+    <div class="form-group1">
       <label for="profitSlider">Dükkan Kar Oranı (%):</label>
-      <input type="range" id="profitSlider" min="0" max="100" value="50">
-      <div class="slider-value" id="profitValue">50%</div>
+      <div class="slider-container">
+        <input type="range" id="profitSlider" min="0" max="100" value="50">
+        <span class="slider-value" id="profitValue">50%</span>
+      </div>
     </div>
+
 
     <!-- Prize Pool Results -->
     <div class="results">
