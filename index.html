@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MTG Tournament Organizer</title>
+  <title>MTG Turnuva Düzenleyici</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-image: url('background.jpg'); /* Replace 'background.jpg' with your image path */
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: #fff;
+      margin: 20px;
+      background-color: #f9f9f9;
     }
     .container {
-      max-width: 800px;
-      margin: 20px auto;
+      max-width: 600px;
+      margin: 0 auto;
       padding: 20px;
-      background: rgba(0, 0, 0, 0.8); /* Transparent background for readability */
+      background: white;
       border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .form-group {
       margin-bottom: 15px;
@@ -35,132 +31,170 @@
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-sizing: border-box;
     }
-    .results, .prize-distribution {
+    .slider-value {
+      text-align: center;
+      font-weight: bold;
+    }
+    .prize-distribution {
       margin-top: 20px;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      background: #f4f4f4;
       border-radius: 8px;
     }
-    .slider-container {
-      display: flex;
-      align-items: center;
+    .prize-row {
       margin-bottom: 10px;
     }
-    .slider-container input[type="number"] {
-      max-width: 80px;
-      margin-left: 10px;
-    }
-    .distributed-total {
+    .error {
+      color: red;
       font-weight: bold;
-      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>MTG Tournament Organizer</h1>
+    <h1>MTG Turnuva Düzenleyici</h1>
+    <!-- Tournament Configuration -->
     <form id="tournament-form">
-      <!-- Fields for Input -->
       <div class="form-group">
-        <label for="prizePool">Total Prize Pool (₺):</label>
-        <input type="number" id="prizePool" step="0.01" value="1000">
+        <label for="numPeople">Katılımcı Sayısı:</label>
+        <input type="number" id="numPeople" min="0" value="0">
       </div>
       <div class="form-group">
-        <label for="numWinners">Number of Winners:</label>
-        <input type="number" id="numWinners" min="1" value="3">
+        <label for="numNoProxy">Proxy Kartsız Katılımcı Sayısı:</label>
+        <input type="number" id="numNoProxy" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label for="entryFee">Kişi Başına Giriş Ücreti (₺):</label>
+        <input type="number" id="entryFee" step="0.01" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label for="costPerPerson">Katılım Ödülü Maliyeti (Kişi Başına) (₺):</label>
+        <input type="number" id="costPerPerson" step="0.01" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label for="costNoProxy">Proxy Kullanmayana Ek Ödül Maliyeti (Kişi Başına) (₺):</label>
+        <input type="number" id="costNoProxy" step="0.01" min="0" value="0">
       </div>
     </form>
+    <div class="form-group">
+      <label for="profitSlider">Dükkan Kar Oranı (%):</label>
+      <input type="range" id="profitSlider" min="0" max="100" value="50">
+      <div class="slider-value" id="profitValue">50%</div>
+    </div>
 
-    <!-- Prize Distribution Section -->
+    <!-- Prize Pool Results -->
+    <div class="results">
+      <p><strong>Toplam Gelir (₺):</strong> <span id="totalGained">0.00</span></p>
+      <p><strong>Toplam Gider (₺):</strong> <span id="totalLost">0.00</span></p>
+      <p><strong>Net Gelir (₺):</strong> <span id="netGained">0.00</span></p>
+      <p><strong>Dükkan Karı (₺):</strong> <span id="netProfit">0.00</span></p>
+      <p><strong>Ödül Havuzu (₺):</strong> <span id="prizePool">0.00</span></p>
+    </div>
+
+    <!-- Prize Distribution -->
     <div class="prize-distribution">
-      <h3>Prize Distribution</h3>
+      <h3>Ödül Dağıtımı</h3>
+      <div class="form-group">
+        <label for="numWinners">Kaç Kişiye Ödül Verilecek?</label>
+        <input type="number" id="numWinners" min="1" value="3">
+      </div>
       <div id="winnerSliders"></div>
-      <p class="distributed-total">Distributed Prize: <span id="distributedPrize">₺0.00</span></p>
+      <div class="results">
+        <p><strong>Toplam Dağıtılan Ödül:</strong> <span id="distributedPrize">0.00</span> ₺</p>
+        <p id="errorMsg" class="error" style="display:none;">Hata: Dağılım yüzdesi toplamı 100 olmalıdır!</p>
+      </div>
     </div>
   </div>
 
   <script>
-    const prizePoolInput = document.getElementById('prizePool');
+    // Elements
+    const numPeopleInput = document.getElementById('numPeople');
+    const numNoProxyInput = document.getElementById('numNoProxy');
+    const entryFeeInput = document.getElementById('entryFee');
+    const costPerPersonInput = document.getElementById('costPerPerson');
+    const costNoProxyInput = document.getElementById('costNoProxy');
+    const profitSlider = document.getElementById('profitSlider');
+    const profitValue = document.getElementById('profitValue');
     const numWinnersInput = document.getElementById('numWinners');
-    const winnerSlidersContainer = document.getElementById('winnerSliders');
+    const winnerSliders = document.getElementById('winnerSliders');
+    const errorMsg = document.getElementById('errorMsg');
+
+    const totalGainedSpan = document.getElementById('totalGained');
+    const totalLostSpan = document.getElementById('totalLost');
+    const netGainedSpan = document.getElementById('netGained');
+    const netProfitSpan = document.getElementById('netProfit');
+    const prizePoolSpan = document.getElementById('prizePool');
     const distributedPrizeSpan = document.getElementById('distributedPrize');
 
-    let sliders = [];
+    function calculate() {
+      const numPeople = parseInt(numPeopleInput.value) || 0;
+      const numNoProxy = parseInt(numNoProxyInput.value) || 0;
+      const entryFee = parseFloat(entryFeeInput.value) || 0;
+      const costPerPerson = parseFloat(costPerPersonInput.value) || 0;
+      const costNoProxy = parseFloat(costNoProxyInput.value) || 0;
+      const profitPercentage = parseInt(profitSlider.value) || 0;
 
-    function calculateDistribution() {
-      const prizePool = parseFloat(prizePoolInput.value) || 0;
+      const totalGained = numPeople * entryFee;
+      const totalLost = (numPeople * costPerPerson) + (numNoProxy * costNoProxy);
+      const netGained = totalGained - totalLost;
+      const netProfit = (netGained * profitPercentage) / 100;
+      const prizePool = netGained - netProfit;
+
+      totalGainedSpan.textContent = totalGained.toFixed(2);
+      totalLostSpan.textContent = totalLost.toFixed(2);
+      netGainedSpan.textContent = netGained.toFixed(2);
+      netProfitSpan.textContent = netProfit.toFixed(2);
+      prizePoolSpan.textContent = prizePool.toFixed(2);
+      profitValue.textContent = `${profitPercentage}%`;
+
+      updatePrizeDistribution(prizePool);
+    }
+
+    function updatePrizeDistribution(prizePool) {
+      const numWinners = parseInt(numWinnersInput.value) || 1;
+      winnerSliders.innerHTML = '';
+
+      let sliders = [];
       let totalPercentage = 0;
 
-      sliders.forEach(({ slider, input }) => {
-        const percentage = parseFloat(slider.value) || 0;
-        const prizeAmount = (prizePool * (percentage / 100)).toFixed(2);
-        input.value = percentage;
-        slider.nextElementSibling.textContent = `₺${prizeAmount}`;
-        totalPercentage += percentage;
-      });
-
-      const distributedPrize = totalPercentage === 100 
-        ? prizePool.toFixed(2) 
-        : "Error: Total != 100%";
-
-      distributedPrizeSpan.textContent = distributedPrize;
-    }
-
-    function setupSliders() {
-      winnerSlidersContainer.innerHTML = '';
-      sliders = [];
-      const numWinners = parseInt(numWinnersInput.value) || 0;
-
       for (let i = 1; i <= numWinners; i++) {
-        const sliderContainer = document.createElement('div');
-        sliderContainer.className = 'slider-container';
+        const row = document.createElement('div');
+        row.className = 'prize-row';
+        row.innerHTML = `
+          <label for="winner${i}">Kazanan ${i}. (%):</label>
+          <input type="range" id="winner${i}" min="0" max="100" value="${i === 1 ? 50 : 0}">
+          <span id="winnerValue${i}">₺0.00 (0%)</span>
+        `;
+        winnerSliders.appendChild(row);
 
-        const label = document.createElement('label');
-        label.textContent = `Winner ${i}:`;
-
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = '0';
-        slider.max = '100';
-        slider.value = '0';
-
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.min = '0';
-        input.max = '100';
-        input.value = '0';
-
-        const amount = document.createElement('span');
-        amount.textContent = '₺0.00';
+        const slider = row.querySelector(`#winner${i}`);
+        const output = row.querySelector(`#winnerValue${i}`);
 
         slider.addEventListener('input', () => {
-          input.value = slider.value;
-          calculateDistribution();
+          totalPercentage = sliders.reduce((sum, s) => sum + parseInt(s.value), 0);
+
+          if (totalPercentage > 100) {
+            errorMsg.style.display = 'block';
+            return;
+          } else {
+            errorMsg.style.display = 'none';
+          }
+
+          const amount = (prizePool * (slider.value / 100)).toFixed(2);
+          output.textContent = `₺${amount} (${slider.value}%)`;
+          distributedPrizeSpan.textContent = totalPercentage === 100 ? `${prizePool.toFixed(2)} ₺` : 'Hatalı!';
         });
 
-        input.addEventListener('input', () => {
-          slider.value = input.value;
-          calculateDistribution();
-        });
-
-        sliderContainer.appendChild(label);
-        sliderContainer.appendChild(slider);
-        sliderContainer.appendChild(input);
-        sliderContainer.appendChild(amount);
-
-        winnerSlidersContainer.appendChild(sliderContainer);
-        sliders.push({ slider, input });
+        sliders.push(slider);
       }
-
-      calculateDistribution();
     }
 
-    prizePoolInput.addEventListener('input', calculateDistribution);
-    numWinnersInput.addEventListener('input', setupSliders);
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
 
-    setupSliders(); // Initialize
+    calculate(); // Initial calculation
   </script>
 </body>
 </html>
