@@ -32,12 +32,22 @@
       text-align: left;
     }
     .form-group1 input {
-  flex: 0 0 150px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  text-align: center; /* This will center the text inside the input boxes */
-}
+      flex: 0 0 150px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .form-group1 input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    .form-group1 input[type="number"]::-webkit-inner-spin-button, 
+    .form-group1 input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: always-visible;
+      margin: 0;
+      opacity: 1;
+    }
     .slider-value {
       text-align: center;
       margin-top: 5px;
@@ -152,6 +162,49 @@
     const netProfitSpan = document.getElementById('netProfit');
     const prizePoolSpan = document.getElementById('prizePool');
     const distributedPrizeSpan = document.getElementById('distributedPrize');
+
+    // Enhanced input handling for all number inputs
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener('keydown', function(e) {
+        // Handle arrow key increments
+        if (e.key === 'ArrowUp') {
+          e.preventDefault(); // Prevent default scrolling
+          let currentValue = parseFloat(this.value) || 0;
+          
+          // For entry fee and cost inputs, use step of 0.01
+          if (this.id === 'entryFee' || this.id === 'costPerPerson' || this.id === 'costNoProxy') {
+            this.value = (currentValue + 0.01).toFixed(2);
+          } else {
+            // For integer inputs, increment by 1
+            this.value = currentValue + 1;
+          }
+          
+          // Trigger input event to recalculate
+          this.dispatchEvent(new Event('input'));
+        } 
+        else if (e.key === 'ArrowDown') {
+          e.preventDefault(); // Prevent default scrolling
+          let currentValue = parseFloat(this.value) || 0;
+          
+          // Ensure value doesn't go below min
+          let minValue = parseFloat(this.min) || 0;
+          
+          // For entry fee and cost inputs, use step of 0.01
+          if (this.id === 'entryFee' || this.id === 'costPerPerson' || this.id === 'costNoProxy') {
+            this.value = Math.max(minValue, currentValue - 0.01).toFixed(2);
+          } else {
+            // For integer inputs, decrement by 1
+            this.value = Math.max(minValue, currentValue - 1);
+          }
+          
+          // Trigger input event to recalculate
+          this.dispatchEvent(new Event('input'));
+        }
+      });
+
+      // Ensure number input always shows arrows
+      input.style.appearance = 'number';
+    });
 
     function calculate() {
       const numPeople = parseInt(numPeopleInput.value) || 0;
