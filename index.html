@@ -5,13 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MTG Turnuva Düzenleyici</title>
   <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background: url('background.jpg') no-repeat center center fixed;
-        background-size: cover;
-        color: #333;
-      }
+    body {
+      margin: 0;
+      height: 100vh; /* Full viewport height */
+      background: url('/path-to-image/background.jpg') no-repeat center center fixed;
+      background-size: contain; /* Maintain aspect ratio and fit the entire height */
+      background-color: #ffffff; /* Optional fallback color */
+    }
+    
+    form {
+      background: rgba(255, 255, 255, 0.9); /* Transparent white background for better visibility */
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 80%; /* Adjust width as needed */
+      max-width: 500px;
+      margin: auto; /* Center form */
+      position: relative; /* Ensure proper stacking context */
+      z-index: 10; /* Place above background */
+    }
+    
 
     .container {
       max-width: 600px;
