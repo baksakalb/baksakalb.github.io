@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 20px;
       background: url('background.jpg') no-repeat center center fixed;
-      background-size: 100% 100%; /* Ensure it always fits the screen */
+      background-size: cover;
       color: #333;
     }
 
@@ -17,57 +17,71 @@
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
-      background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
+
     .form-group1 {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 15px;
     }
+
     .form-group1 label {
       flex: 1;
       margin-right: 10px;
       text-align: left;
     }
+
     .form-group1 input {
       flex: 0 0 150px;
       padding: 5px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      text-align: center; /* Center the text inside the input fields */
-    }
-    .slider-value {
       text-align: center;
-      margin-top: 5px;
     }
-    .results, .prize-distribution {
-      margin-top: 20px;
-    }
-    .prize-row {
-      margin-bottom: 10px;
-    }
-    .prize-row label {
-      margin-right: 10px;
-    }
+
     .slider-container {
       display: flex;
       align-items: center;
-      gap: 10px; /* Space between slider and value */
-      width: 100%; /* Ensure the container takes up available space */
+      gap: 10px;
+      width: 100%;
     }
+
     .slider-container input[type="range"] {
-      flex: 1; /* Slider grows to fill available space */
+      flex: 1;
     }
+
     .input-box {
       width: 60px;
       padding: 5px;
       margin-left: 10px;
-      text-align: center; /* Center the text inside the number input fields */
+      text-align: center;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+
+    .results, .prize-distribution {
+      margin-top: 20px;
+    }
+
+    .prize-row {
+      margin-bottom: 10px;
+    }
+
+    .prize-row label {
+      margin-right: 10px;
+    }
+
+    .slider-value {
+      text-align: center;
+      margin-top: 5px;
+    }
+
+    .error {
+      color: red;
     }
   </style>
 </head>
@@ -130,7 +144,6 @@
   </div>
 
   <script>
-    // Elements
     const numPeopleInput = document.getElementById('numPeople');
     const numNoProxyInput = document.getElementById('numNoProxy');
     const entryFeeInput = document.getElementById('entryFee');
@@ -176,7 +189,6 @@
     function updatePrizeDistribution(prizePool) {
       const numWinners = parseInt(numWinnersInput.value) || 1;
       winnerSliders.innerHTML = '';
-
       let sliders = [];
       let totalPercentage = 0;
 
@@ -185,36 +197,48 @@
         row.className = 'prize-row';
         row.innerHTML = `
           <label for="winner${i}">Ödül ${i} (%):</label>
-          <input type="number" id="winner${i}" value="${100 / numWinners}" min="0" max="100" step="1" class="input-box">
+          <input type="range" id="slider${i}" min="0" max="100" step="1" value="${(100 / numWinners).toFixed(2)}" class="slider">
+          <input type="number" id="winner${i}" min="0" max="100" step="1" value="${(100 / numWinners).toFixed(2)}" class="input-box">
         `;
         winnerSliders.appendChild(row);
 
-        const sliderInput = row.querySelector(`#winner${i}`);
-        sliderInput.addEventListener('input', () => {
-          totalPercentage = sliders.reduce((acc, slider) => acc + parseFloat(slider.value || 0), 0);
+        const slider = row.querySelector(`#slider${i}`);
+        const inputBox = row.querySelector(`#winner${i}`);
 
-          if (totalPercentage === 100) {
-            errorMsg.style.display = 'none';
-          } else {
-            errorMsg.style.display = 'block';
-          }
+        const updateValues = () => {
+          inputBox.value = slider.value;
+          sliders.forEach(slider => totalPercentage += parseInt(slider.value));
+          totalPercentage === 100 ? errorMsg.style.display = "none" : errorMsg.style.display = "block";
+          distributedPrizeSpan.textContent = totalPercentage * prizePool;
+        };
 
-          const distributedPrize = prizePool * (totalPercentage / 100);
-          distributedPrizeSpan.textContent = distributedPrize.toFixed(2);
+        slider.addEventListener('input', updateValues);
+        inputBox.addEventListener('input', (e) => {
+          let value = parseInt(e.target.value);
+          if (value < 0) value = 0;
+          if (value > 100) value = 100;
+          e.target.value = value;
+          slider.value = value;
+          updateValues();
         });
 
-        sliders.push(sliderInput);
+        sliders.push(slider);
       }
+
+      // Initial call to update prize distribution
+      updateValues();
     }
 
-    // Event Listeners
-    [numPeopleInput, numNoProxyInput, entryFeeInput, costPerPersonInput, costNoProxyInput, profitSlider].forEach(input => {
-      input.addEventListener('input', calculate);
-    });
+    // Call the calculate function when any input changes
+    numPeopleInput.addEventListener('input', calculate);
+    numNoProxyInput.addEventListener('input', calculate);
+    entryFeeInput.addEventListener('input', calculate);
+    costPerPersonInput.addEventListener('input', calculate);
+    costNoProxyInput.addEventListener('input', calculate);
+    profitSlider.addEventListener('input', calculate);
+    numWinnersInput.addEventListener('input', calculate);
 
-    numWinnersInput.addEventListener('input', () => updatePrizeDistribution(parseFloat(prizePoolSpan.textContent)));
-
-    // Initial Calculation
+    // Initialize the prize distribution sliders
     calculate();
   </script>
 </body>
