@@ -4,72 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MTG Turnuva Düzenleyici</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #333;
-  }
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  .form-group1 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-  .form-group1 label {
-    flex: 1;
-    margin-right: 10px;
-    text-align: left;
-  }
-  .form-group1 input {
-    flex: 0 0 150px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: center; /* Center the text inside the input fields */
-  }
-  .slider-value {
-    text-align: center;
-    margin-top: 5px;
-  }
-  .results, .prize-distribution {
-    margin-top: 20px;
-  }
-  .prize-row {
-    margin-bottom: 10px;
-  }
-  .prize-row label {
-    margin-right: 10px;
-  }
-  .slider-container {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Space between slider and value */
-    width: 100%; /* Ensure the container takes up available space */
-  }
-  .slider-container input[type="range"] {
-    flex: 1; /* Slider grows to fill available space */
-  }
-  .input-box {
-    width: 60px;
-    padding: 5px;
-    margin-left: 10px;
-    text-align: center; /* Center the text inside the number input fields */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-</style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .form-group1 label {
+      flex: 1;
+      margin-right: 10px;
+      text-align: left;
+    }
+    .form-group1 input {
+      flex: 0 0 150px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .slider-value {
+      text-align: center;
+      margin-top: 5px;
+    }
+    .results, .prize-distribution {
+      margin-top: 20px;
+    }
+    .prize-row {
+      margin-bottom: 10px;
+    }
+    .prize-row label {
+      margin-right: 10px;
+    }
+    .slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between slider and value */
+  width: 100%; /* Ensure the container takes up available space */
+}
 
+.slider-container input[type="range"] {
+  flex: 1; /* Slider grows to fill available space */
+}
+  </style>
 </head>
 <body>
   <div class="container">
@@ -104,6 +95,7 @@
         <span class="slider-value" id="profitValue">50%</span>
       </div>
     </div>
+
 
     <!-- Prize Pool Results -->
     <div class="results">
@@ -185,64 +177,40 @@
         row.className = 'prize-row';
         row.innerHTML = 
           <label for="winner${i}">Kazanan ${i}. (%):</label>
-          <div class="slider-container">
-            <input type="range" id="winner${i}" min="0" max="100" value="${i === 1 ? 50 : 0}">
-            <input type="number" id="winnerInput${i}" value="${i === 1 ? 50 : 0}" class="input-box">
-            <span id="winnerValue${i}">₺0.00 (0%)</span>
-          </div>
+          <input type="range" id="winner${i}" min="0" max="100" value="${i === 1 ? 50 : 0}">
+          <span id="winnerValue${i}">₺0.00 (0%)</span>
         ;
         winnerSliders.appendChild(row);
 
         const slider = row.querySelector(#winner${i});
-        const inputBox = row.querySelector(#winnerInput${i});
         const output = row.querySelector(#winnerValue${i});
 
-        // Update slider and input box together
         slider.addEventListener('input', () => {
-          inputBox.value = slider.value;
-          updatePrizeAmount(slider, prizePool, output);
-        });
+          totalPercentage = sliders.reduce((sum, s) => sum + parseInt(s.value), 0);
 
-        // Update slider when the input box value is changed
-        inputBox.addEventListener('input', () => {
-          const value = parseInt(inputBox.value);
-          if (value >= 0 && value <= 100) {
-            slider.value = value;
-            updatePrizeAmount(slider, prizePool, output);
+          if (totalPercentage > 100) {
+            errorMsg.style.display = 'block';
+            return;
+          } else {
+            errorMsg.style.display = 'none';
           }
+
+          const amount = (prizePool * (slider.value / 100)).toFixed(2);
+          output.textContent = ₺${amount} (${slider.value}%);
+          distributedPrizeSpan.textContent = totalPercentage === 100 ? ${prizePool.toFixed(2)} ₺ : 'Hatalı!';
         });
 
         sliders.push(slider);
       }
     }
 
-    function updatePrizeAmount(slider, prizePool, output) {
-      let totalPercentage = 0;
-      sliders.forEach(slider => {
-        totalPercentage += parseInt(slider.value);
-      });
-
-      if (totalPercentage > 100) {
-        errorMsg.style.display = 'block';
-        return;
-      } else {
-        errorMsg.style.display = 'none';
-      }
-
-      const amount = (prizePool * (slider.value / 100)).toFixed(2);
-      output.textContent = ₺${amount} (${slider.value}%);
-      distributedPrizeSpan.textContent = totalPercentage === 100 ? ${prizePool.toFixed(2)} ₺ : 'Hatalı!';
-    }
-
-    profitSlider.addEventListener('input', calculate);
-    numPeopleInput.addEventListener('input', calculate);
-    numNoProxyInput.addEventListener('input', calculate);
-    entryFeeInput.addEventListener('input', calculate);
-    costPerPersonInput.addEventListener('input', calculate);
-    costNoProxyInput.addEventListener('input', calculate);
-    numWinnersInput.addEventListener('input', calculate);
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
 
     calculate(); // Initial calculation
   </script>
 </body>
 </html>
+
+they should go to the right of that box
