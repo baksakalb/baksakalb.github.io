@@ -8,18 +8,22 @@
 body {
     margin: 0;
     padding: 0;
-    height: 100vh; /* Ensure the body takes the full height of the viewport */
-    background: url('background.jpg') no-repeat center center; /* Replace 'your-image.jpg' with the path to your image */
-    background-size: auto 100%; /* Scale the height to 100% and adjust the width while maintaining aspect ratio */
+    height: 100vh; /* Full height of the viewport */
+    display: flex; /* Use Flexbox for alignment */
+    justify-content: center; /* Horizontally center */
+    align-items: center; /* Vertically center */
+    background: url('background.jpg') no-repeat center center; /* Background image */
+    background-size: auto 100%; /* Scale image height to 100% */
 }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.8); /* Semi-transparent container */
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+
+.container {
+    max-width: 600px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: auto 0; /* Auto margin ensures centering */
+}
     .form-group1 {
       display: flex;
       align-items: center;
